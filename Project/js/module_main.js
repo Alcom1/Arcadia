@@ -25,8 +25,6 @@ app.main =
     debug : true,				// debug
 	animationID : 0,			//ID index of the current frame.
 	
-	radius : 12,
-	
     //Initialization
 	init : function()
 	{
