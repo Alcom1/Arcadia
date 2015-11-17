@@ -25,6 +25,9 @@ app.main =
     debug : true,				// debug
 	animationID : 0,			//ID index of the current frame.
 	
+	player : undefined,
+	target : undefined,
+	
     //Initialization
 	init : function()
 	{
@@ -36,6 +39,19 @@ app.main =
 		this.canvas.width = this.WIDTH;
 		this.canvas.height = this.HEIGHT;
 		this.ctx = this.canvas.getContext('2d');
+		
+		//Game objects
+		this.player = new Object(
+			300,
+			300,
+			20,
+			"#FFF");
+			
+		this.target = new Object(
+			300,
+			300,
+			80,
+			"#FFF");
 		
 		// start the game loop
 		this.update();
@@ -56,12 +72,57 @@ app.main =
 		this.ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
 		this.ctx.restore();
 		
+		//Logic
+		this.player.pos.x += 200 * dt;
+		
+		//Save
+		this.ctx.save();
+		
+		//Transform
+		this.scaleByPos(.75);
+		
+		//Draw
+		this.player.draw(this.ctx);
+		this.target.draw(this.ctx);
+		
+		//Restore
+		this.ctx.restore();
+		
 		//Draw debug info
 		if (this.debug)
 		{
 			// draw dt in bottom right corner
 			this.fillText("dt: " + dt.toFixed(3), this.WIDTH - 140, this.HEIGHT - 10, "18pt courier", "white");
 		}
+	},
+	
+	//Set view transform based on implicit player and target and explicit multiplier
+	scaleByPos : function(multiplier)
+	{
+		//Midpoint between the player and target
+		var diffX = (this.player.pos.x + this.target.pos.x) / 2;
+		var diffY = (this.player.pos.y + this.target.pos.y) / 2;
+		
+		//Distance between the player and target
+		var distX = Math.abs(this.player.pos.x - this.target.pos.x) + this.target.radius * 2;
+		var distY = Math.abs(this.player.pos.y - this.target.pos.y) + this.target.radius * 2;
+		
+		//Scale to the target
+		var scale = 1;
+		
+		if(distX > distY)
+		{
+			scale = multiplier * this.WIDTH / distX;
+		}
+		else
+		{
+			scale = multiplier * this.HEIGHT / distY;
+		}
+		this.ctx.scale(
+			scale, scale);
+		this.ctx.translate(
+			1 / scale * this.WIDTH / 2 - diffX,
+			1 / scale * this.HEIGHT / 2 - diffY);
 	},
 	
 	//Draw filled text
