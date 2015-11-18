@@ -1,6 +1,7 @@
 var Object = function(x, y, radius, color)
 {
 	this.pos = new Vect(x, y, 0);
+	this.vel = new Vect(0, 0, 0);
 	this.radius = radius;
 	this.color = color;
 }
@@ -18,4 +19,9 @@ Object.prototype.draw = function(ctx)
 	ctx.fillStyle = this.color;
 	ctx.fill();
 	ctx.restore();
+}
+
+Object.prototype.move = function()
+{
+	this.pos.add(this.vel);
 }
