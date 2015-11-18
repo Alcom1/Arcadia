@@ -73,7 +73,22 @@ app.main =
 		this.ctx.restore();
 		
 		//Logic
-		this.player.pos.x += 200 * dt;
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_W])
+		{
+			this.player.pos.y -= 120 * dt;
+		}
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_D])
+		{
+			this.player.pos.x += 120 * dt;
+		}
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_S])
+		{
+			this.player.pos.y += 120 * dt;
+		}
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_A])
+		{
+			this.player.pos.x -= 120 * dt;
+		}
 		
 		//Save
 		this.ctx.save();
