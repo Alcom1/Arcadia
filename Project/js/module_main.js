@@ -36,6 +36,8 @@ app.main =
 	
 	color : "#FFF",
 	
+	bgImage : undefined,
+	
 	player : undefined,
 	target : undefined,
 	
@@ -57,6 +59,10 @@ app.main =
 		this.canvas.onmousedown = this.doMousedown.bind(this);
 		this.canvas.onmouseup = this.doMouseup.bind(this);
 		this.canvas.onmousemove = this.doMousemove.bind(this);
+		
+		this.bgImage = new Image(100, 200);
+		this.bgImage .src = "assets/temp.png";
+		console.log(this.bgImage);
 		
 		//Mouse position
 		this.mousePosRaw = new Vect(0, 0, 0);
@@ -125,8 +131,19 @@ app.main =
 		this.scaleByPos(.75);
 		
 		//Draw
+		this.drawBG(this.ctx);
 		this.player.draw(this.ctx, this.color);
 		this.target.draw(this.ctx, this.color);
+		
+		this.ctx.beginPath();
+		this.ctx.arc(
+			-this.transX,
+			-this.transY,
+			20,
+			0,
+			Math.PI * 2);
+		this.ctx.fillStyle = "#F00";
+		this.ctx.fill();
 		
 		this.ctx.beginPath();
 		this.ctx.arc(
@@ -202,6 +219,11 @@ app.main =
 		var bord = (this.player.radius + this.target.radius) * (this.player.radius + this.target.radius);
 		
 		return dist < bord;
+	},
+	
+	drawBG : function(ctx)
+	{
+		
 	},
 	
 	//Draw filled text
