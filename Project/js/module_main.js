@@ -25,7 +25,8 @@ app.main =
     debug : true,				// debug
 	animationID : 0,			// ID index of the current frame.
 	mouseDown : false,			// If mouse is down.
-	mousePos : undefined,		// Mouse position
+	mousePosRaw : undefined,	// Mouse position
+	mousePos : undefined,
 	
 	transX : 0,
 	transY : 0,
@@ -52,6 +53,7 @@ app.main =
 		this.canvas.onmousemove = this.doMousemove.bind(this);
 		
 		//Mouse position
+		this.mousePosRaw = new Vect(0, 0, 0);
 		this.mousePos = new Vect(0, 0, 0);
 		
 		//Game objects
@@ -87,6 +89,8 @@ app.main =
 		this.ctx.restore();
 		
 		//Logic
+		this.mousePos = this.mousePosRaw.getDiv(this.scale).getSub(new Vect(this.transX, this.transY, 0));
+		
 		if(myKeys.keydown[myKeys.KEYBOARD.KEY_W])
 		{
 			this.player.vel.y -= 25 * dt;
@@ -109,7 +113,7 @@ app.main =
 			this.player.vel.add(this.mousePos.getSub(this.player.pos).getNorm().getMult(25 * dt));
 		}
 		
-		//this.player.vel.mult(.95);
+		this.player.vel.mult(.95);
 		this.player.move();
 		
 		//Save
@@ -160,7 +164,7 @@ app.main =
 	//Mouse move tracking
 	doMousemove : function(e)
 	{
-		this.mousePos = getMouse(e, 0, 0).getDiv(this.scale).getSub(new Vect(this.transX, this.transY, 0));
+		this.mousePosRaw = getMouse(e, 0, 0);
 	},
 	
 	//Set view transform based on implicit player and target and explicit multiplier
