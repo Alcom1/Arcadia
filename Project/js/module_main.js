@@ -19,6 +19,8 @@ app.main =
 {
     WIDTH : 480, 				// Canvas width
     HEIGHT : 480,				// Canvas height
+	SIZE : undefined,
+	
     canvas : undefined,			// Canvas
     ctx : undefined,			// Canvas context
    	lastTime : 0, 				// used by calculateDeltaTime() 
@@ -26,11 +28,13 @@ app.main =
 	animationID : 0,			// ID index of the current frame.
 	mouseDown : false,			// If mouse is down.
 	mousePosRaw : undefined,	// Mouse position
-	mousePos : undefined,
+	mousePos : undefined,		// Mouse position with translation and scaling.
 	
 	transX : 0,
 	transY : 0,
 	scale : 1,
+	
+	color : "#FFF",
 	
 	player : undefined,
 	target : undefined,
@@ -45,7 +49,9 @@ app.main =
 		this.canvas = document.querySelector('canvas');
 		this.canvas.width = this.WIDTH;
 		this.canvas.height = this.HEIGHT;
+		this.canvas.style.cursor = "none";
 		this.ctx = this.canvas.getContext('2d');
+		this.SIZE = Math.min(this.WIDTH, this.HEIGHT);
 		
 		//Hook up mouse events
 		this.canvas.onmousedown = this.doMousedown.bind(this);
@@ -59,8 +65,8 @@ app.main =
 		//Game objects
 		this.player = new Object(
 			300,
-			300,
-			20,
+			50,
+			15,
 			"#FFF");
 			
 		this.target = new Object(
@@ -91,30 +97,26 @@ app.main =
 		//Logic
 		this.mousePos = this.mousePosRaw.getDiv(this.scale).getSub(new Vect(this.transX, this.transY, 0));
 		
-		if(myKeys.keydown[myKeys.KEYBOARD.KEY_W])
-		{
-			this.player.vel.y -= 25 * dt;
-		}
-		if(myKeys.keydown[myKeys.KEYBOARD.KEY_D])
-		{
-			this.player.vel.x += 25 * dt;
-		}
-		if(myKeys.keydown[myKeys.KEYBOARD.KEY_S])
-		{
-			this.player.vel.y += 25 * dt;
-		}
-		if(myKeys.keydown[myKeys.KEYBOARD.KEY_A])
-		{
-			this.player.vel.x -= 25 * dt;
-		}
-		
 		if(this.mouseDown)
 		{
 			this.player.vel.add(this.mousePos.getSub(this.player.pos).getNorm().getMult(25 * dt));
 		}
 		
+		if(this.checkCollision())
+		{
+			this.target.vel = this.player.vel;
+			this.player.vel = new Vect(0, 0, 0);
+		}
+		else
+		{
+			
+		}
+		
 		this.player.vel.mult(.95);
 		this.player.move();
+		
+		this.target.vel.mult(.99);
+		this.target.move();
 		
 		//Save
 		this.ctx.save();
@@ -123,8 +125,8 @@ app.main =
 		this.scaleByPos(.75);
 		
 		//Draw
-		this.player.draw(this.ctx);
-		this.target.draw(this.ctx);
+		this.player.draw(this.ctx, this.color);
+		this.target.draw(this.ctx, this.color);
 		
 		this.ctx.beginPath();
 		this.ctx.arc(
@@ -175,17 +177,11 @@ app.main =
 		var diffY = (this.player.pos.y + this.target.pos.y) / 2;
 		
 		//Distance between the player and target
-		var distX = Math.abs(this.player.pos.x - this.target.pos.x) + this.target.radius * 2;
-		var distY = Math.abs(this.player.pos.y - this.target.pos.y) + this.target.radius * 2;
+		var dist = Math.sqrt(
+			(this.player.pos.x - this.target.pos.x) * (this.player.pos.x - this.target.pos.x) +
+			(this.player.pos.y - this.target.pos.y) * (this.player.pos.y - this.target.pos.y)) + this.target.radius * 2;
 		
-		if(distX > distY)
-		{
-			this.scale = multiplier * this.WIDTH / distX;
-		}
-		else
-		{
-			this.scale = multiplier * this.HEIGHT / distY;
-		}
+		this.scale = multiplier * this.SIZE / dist;
 		
 		this.ctx.scale(
 			this.scale, this.scale);
@@ -196,6 +192,16 @@ app.main =
 		this.ctx.translate(
 			this.transX,
 			this.transY);
+	},
+	
+	checkCollision : function()
+	{
+		var dist =
+			(this.player.pos.x - this.target.pos.x) * (this.player.pos.x - this.target.pos.x) + 
+			(this.player.pos.y - this.target.pos.y) * (this.player.pos.y - this.target.pos.y);
+		var bord = (this.player.radius + this.target.radius) * (this.player.radius + this.target.radius);
+		
+		return dist < bord;
 	},
 	
 	//Draw filled text

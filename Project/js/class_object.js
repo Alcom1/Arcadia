@@ -1,12 +1,11 @@
-var Object = function(x, y, radius, color)
+var Object = function(x, y, radius)
 {
 	this.pos = new Vect(x, y, 0);
 	this.vel = new Vect(0, 0, 0);
 	this.radius = radius;
-	this.color = color;
 }
 
-Object.prototype.draw = function(ctx)
+Object.prototype.draw = function(ctx, color)
 {
 	ctx.save();
 	ctx.beginPath();
@@ -16,7 +15,7 @@ Object.prototype.draw = function(ctx)
 		this.radius, 
 		0, 
 		Math.PI * 2);
-	ctx.fillStyle = this.color;
+	ctx.fillStyle = color;
 	ctx.fill();
 	ctx.restore();
 }
