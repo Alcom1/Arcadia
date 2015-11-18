@@ -60,8 +60,8 @@ app.main =
 		this.canvas.onmouseup = this.doMouseup.bind(this);
 		this.canvas.onmousemove = this.doMousemove.bind(this);
 		
-		this.bgImage = new Image(100, 200);
-		this.bgImage .src = "assets/temp.png";
+		this.bgImage = new Image(128, 128);
+		this.bgImage.src = "assets/temp.png";
 		console.log(this.bgImage);
 		
 		//Mouse position
@@ -113,10 +113,6 @@ app.main =
 			this.target.vel = this.player.vel;
 			this.player.vel = new Vect(0, 0, 0);
 		}
-		else
-		{
-			
-		}
 		
 		this.player.vel.mult(.95);
 		this.player.move();
@@ -135,28 +131,18 @@ app.main =
 		this.player.draw(this.ctx, this.color);
 		this.target.draw(this.ctx, this.color);
 		
-		this.ctx.beginPath();
-		this.ctx.arc(
-			-this.transX,
-			-this.transY,
-			20,
-			0,
-			Math.PI * 2);
-		this.ctx.fillStyle = "#F00";
-		this.ctx.fill();
-		
-		this.ctx.beginPath();
-		this.ctx.arc(
-			this.mousePos.x,
-			this.mousePos.y,
-			5,
-			0,
-			Math.PI * 2);
-		this.ctx.fillStyle = "#F00";
-		this.ctx.fill();
-		
 		//Restore
 		this.ctx.restore();
+		
+		this.ctx.beginPath();
+		this.ctx.arc(
+			this.mousePosRaw.x,
+			this.mousePosRaw.y,
+			12,
+			0,
+			Math.PI * 2);
+		this.ctx.fillStyle = "rgba(0, 200, 200, 0.8)";
+		this.ctx.fill();
 		
 		//Draw debug info
 		if (this.debug)
@@ -198,19 +184,24 @@ app.main =
 			(this.player.pos.x - this.target.pos.x) * (this.player.pos.x - this.target.pos.x) +
 			(this.player.pos.y - this.target.pos.y) * (this.player.pos.y - this.target.pos.y)) + this.target.radius * 2;
 		
+		//Scale to keep both player and target in 
 		this.scale = multiplier * this.SIZE / dist;
 		
+		//Scale canvas
 		this.ctx.scale(
 			this.scale, this.scale);
 		
-		
+		//Transformation to keep canvas around midpoint.
 		this.transX = 1 / this.scale * this.WIDTH / 2 - diffX;
 		this.transY = 1 / this.scale * this.HEIGHT / 2 - diffY;
+		
+		//Translate canvas
 		this.ctx.translate(
 			this.transX,
 			this.transY);
 	},
 	
+	//Check for collision between player and target, return true if collision occured.
 	checkCollision : function()
 	{
 		var dist =
@@ -221,9 +212,21 @@ app.main =
 		return dist < bord;
 	},
 	
+	//Draw the tiled background.
 	drawBG : function(ctx)
 	{
+		var originX = -this.transX - (-this.transX % this.bgImage.width);
+		var originY = -this.transY - (-this.transY % this.bgImage.height);
 		
+		var countX = Math.ceil(this.WIDTH / (this.scale * this.bgImage.width)) + 1;
+		var countY = Math.ceil(this.HEIGHT / (this.scale * this.bgImage.height)) + 1;
+		for(var j = -1; j < countY; j++)
+		{
+			for(var i = -1; i < countX; i++)
+			{
+				ctx.drawImage(this.bgImage, originX + i * this.bgImage.width, originY + j * this.bgImage.height);
+			}
+		}
 	},
 	
 	//Draw filled text
