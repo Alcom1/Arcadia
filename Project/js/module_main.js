@@ -122,6 +122,16 @@ app.main =
 		this.player.draw(this.ctx);
 		this.target.draw(this.ctx);
 		
+		this.ctx.beginPath();
+		this.ctx.arc(
+			this.mousePos.x,
+			this.mousePos.y,
+			5,
+			0,
+			Math.PI * 2);
+		this.ctx.fillStyle = "#F00";
+		this.ctx.fill();
+		
 		//Restore
 		this.ctx.restore();
 		
@@ -150,7 +160,7 @@ app.main =
 	//Mouse move tracking
 	doMousemove : function(e)
 	{
-		this.mousePos = getMouse(e, 0, 0).getSub(new Vect(this.transX, this.transY, 0)).getDiv(this.scale);
+		this.mousePos = getMouse(e, 0, 0).getDiv(this.scale).getSub(new Vect(this.transX, this.transY, 0));
 	},
 	
 	//Set view transform based on implicit player and target and explicit multiplier
